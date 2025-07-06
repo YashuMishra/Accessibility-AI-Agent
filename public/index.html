@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility AI Agent - Bug Logging System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 16px 32px 16px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+            color: #fff;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 24px rgba(102,126,234,0.25);
+        }
+
+        .header p {
+            font-size: 1.15rem;
+            opacity: 0.92;
+            font-weight: 400;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 36px;
+            margin-bottom: 36px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 18px;
+            padding: 32px 28px 28px 28px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.13), 0 1.5px 6px rgba(118,75,162,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1.5px solid #e6e6f7;
+        }
+
+        .card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 16px 48px rgba(102,126,234,0.18), 0 2px 8px rgba(118,75,162,0.12);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 22px;
+            font-size: 1.45rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            letter-spacing: 0.2px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 14px;
+            border: 2px solid #e1e5e9;
+            border-radius: 9px;
+            font-size: 15px;
+            background: #f8f9ff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 2px rgba(118,75,162,0.09);
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+            border: 2px dashed #667eea;
+            border-radius: 9px;
+            background: #f4f6ff;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .file-upload-label:hover {
+            background: #e8ecff;
+            border-color: #764ba2;
+        }
+
+        .file-upload-label i {
+            margin-right: 12px;
+            font-size: 1.25rem;
+            color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 600;
+            transition: all 0.18s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(102,126,234,0.10);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 18px rgba(102,126,234,0.18);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 22px;
+        }
+
+        .loading i {
+            animation: spin 1s linear infinite;
+            font-size: 2.1rem;
+            color: #667eea;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            background: rgba(255,255,255,0.98);
+            border-radius: 18px;
+            padding: 32px 28px 28px 28px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.13), 0 1.5px 6px rgba(118,75,162,0.08);
+            margin-top: 36px;
+            border: 1.5px solid #e6e6f7;
+        }
+
+        .result-section h2 {
+            color: #667eea;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .report-content {
+            background: #f8f9fa;
+            border-radius: 9px;
+            padding: 22px;
+            white-space: pre-wrap;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 15px;
+            line-height: 1.7;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1.5px solid #e9ecef;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 9px;
+            margin: 10px 0;
+            border: 1.5px solid #f5c6cb;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 9px;
+            margin: 10px 0;
+            border: 1.5px solid #c3e6cb;
+        }
+
+        .training-section {
+            background: rgba(255,255,255,0.98);
+            border-radius: 18px;
+            padding: 32px 28px 28px 28px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.13), 0 1.5px 6px rgba(118,75,162,0.08);
+            margin-top: 36px;
+            border: 1.5px solid #e6e6f7;
+        }
+
+        .training-examples {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1.5px solid #e9ecef;
+            border-radius: 9px;
+            padding: 18px;
+            background: #f8f9ff;
+        }
+
+        .example-item {
+            background: #f8f9fa;
+            border-radius: 7px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 1px 4px rgba(102,126,234,0.07);
+        }
+
+        .example-item h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .example-item p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.98);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.10);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .status-item i {
+            color: #667eea;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: all 0.18s;
+            box-shadow: 0 2px 8px rgba(40,167,69,0.10);
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+            transform: scale(1.04);
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 2.1rem;
+            }
+            .container {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .card, .result-section, .training-section {
+                padding: 18px 8px 16px 8px;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-left p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .linkedin-link {
+            color: #fff;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .linkedin-link:hover {
+            color: #00a0dc;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .ai-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .gemini-btn {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+        }
+
+        .gemini-btn:hover {
+            background: linear-gradient(135deg, #3367d6, #2d8f47);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .copilot-btn {
+            background: linear-gradient(135deg, #0078d4, #106ebe);
+        }
+
+        .copilot-btn:hover {
+            background: linear-gradient(135deg, #006cbd, #0e5ea6);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 120, 212, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-right {
+                justify-content: center;
+            }
+        }
+
+        .accessibility-cards-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 24px;
+            margin: 40px 0 0 0;
+            padding: 0 40px 0 0;
+            animation: fadeInUp 1s ease;
+        }
+
+        .access-card {
+            background: rgba(255,255,255,0.12);
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px 20px;
+            width: 220px;
+            min-height: 180px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInCard 0.8s forwards;
+            perspective: 600px;
+        }
+
+        .access-card:nth-child(1) { animation-delay: 0.1s; }
+        .access-card:nth-child(2) { animation-delay: 0.2s; }
+        .access-card:nth-child(3) { animation-delay: 0.3s; }
+        .access-card:nth-child(4) { animation-delay: 0.4s; }
+        .access-card:focus, .access-card:hover {
+            transform: translateY(-8px) scale(1.04) rotateY(8deg) rotateX(4deg);
+            box-shadow: 0 8px 24px rgba(66,133,244,0.18);
+            background: rgba(255,255,255,0.18);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .card-desc {
+            font-size: 0.98rem;
+            text-align: center;
+        }
+
+        @keyframes fadeInCard {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            .accessibility-cards-row {
+                flex-direction: column;
+                align-items: center;
+                padding: 0;
+            }
+            .access-card {
+                width: 90vw;
+                margin-bottom: 18px;
+            }
+        }
+
+        .result-sections-row {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+            align-items: flex-start;
+            margin-top: 32px;
+        }
+        .result-section {
+            flex: 1 1 0;
+            min-width: 320px;
+            max-width: 600px;
+        }
+        @media (max-width: 900px) {
+            .result-sections-row {
+                flex-direction: column;
+                gap: 18px;
+            }
+        }
+
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            z-index: 1000;
+            background: #fff;
+            color: #222;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: left 0.2s;
+        }
+        .skip-link:focus {
+            left: 16px;
+            top: 16px;
+            width: auto;
+            height: auto;
+            outline: 3px solid #005fcc;
+            outline-offset: 2px;
+        }
+        .file-upload-label:focus, .file-upload-label:focus-visible {
+            outline: 3px solid #ffb300;
+            outline-offset: 2px;
+            background: #222;
+            color: #fff;
+        }
+        .form-control:focus, select:focus, textarea:focus, button:focus {
+            outline: 3px solid #005fcc !important;
+            outline-offset: 2px;
+            background: #fffbe6;
+            color: #222;
+        }
+        .info-icon {
+            display: inline-block;
+            margin-left: 6px;
+            color: #005fcc;
+            cursor: pointer;
+            font-size: 1.1em;
+            vertical-align: middle;
+            position: relative;
+            outline: none;
+        }
+        .info-icon:focus, .info-icon:focus-visible, .info-icon:active {
+            color: #ffb300;
+            outline: 4px solid #222;
+            outline-offset: 2px;
+            border-radius: 50%;
+            background: #fffbe6;
+            z-index: 2;
+        }
+        .info-icon:hover {
+            color: #ffb300;
+        }
+        .custom-tooltip {
+            position: absolute;
+            left: 50%;
+            top: 120%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.98em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            white-space: pre-line;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            min-width: 180px;
+            max-width: 320px;
+        }
+        .info-icon.show-tooltip .custom-tooltip {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .info-icon:focus .custom-tooltip,
+        .info-icon:hover .custom-tooltip {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .visually-hidden {
+            position: absolute !important;
+            height: 1px; width: 1px;
+            overflow: hidden;
+            clip: rect(1px, 1px, 1px, 1px);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-universal-access"></i> Accessibility AI Agent</h1>
+            <p>AI-powered bug logging system with learning capabilities</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fas fa-robot"></i>
+                <span id="ai-provider">Loading...</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-database"></i>
+                <span id="training-count">Loading...</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-heartbeat"></i>
+                <span id="server-status">Loading...</span>
+            </div>
+        </div>
+
+        <a href="#mainContent" class="skip-link">Skip to main content</a>
+
+        <div class="main-content" id="mainContent">
+            <div class="card">
+                <h2><i class="fas fa-upload" aria-hidden="true"></i> Upload Screenshot
+                    <span class="info-icon" tabindex="0" aria-label="Info" aria-describedby="screenshotInfo"><i class="fas fa-info-circle"></i><span class="custom-tooltip" role="tooltip">Attach a screenshot of the issue. This is required for generating a detailed bug report. Use keyboard to tab to the file input and press Enter or Space to activate.</span></span>
+                </h2>
+                <div id="screenshotInfo" class="visually-hidden">Attach a screenshot of the issue. This is required for generating a detailed bug report. Use keyboard to tab to the file input and press Enter or Space to activate.</div>
+                <form id="bugReportForm" autocomplete="on" novalidate>
+                    <div class="form-group">
+                        <label for="screenshot">Screenshot (PNG, JPG, GIF, WEBP) <span aria-hidden="true" style="color:red;">*</span></label>
+                        <div class="file-upload">
+                            <input type="file" id="screenshot" name="screenshot" accept="image/*" required aria-required="true" aria-describedby="screenshotInfo"/>
+                            <label for="screenshot" class="file-upload-label" tabindex="0" aria-label="Attach screenshot" aria-describedby="screenshotInfo">
+                                <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
+                                <span id="fileLabel">Choose a screenshot file</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="oneliner">Issue Description (One-liner) <span aria-hidden="true" style="color:red;">*</span>
+                            <span class="info-icon" tabindex="0" aria-label="Info" aria-describedby="onelinerInfo"><i class="fas fa-info-circle"></i><span class="custom-tooltip" role="tooltip">Provide a concise summary of the accessibility issue. For example: 'Narrator announces blank for permission combo boxes'.</span></span>
+                        </label>
+                        <div id="onelinerInfo" class="visually-hidden">Provide a concise summary of the accessibility issue. For example: 'Narrator announces blank for permission combo boxes'.</div>
+                        <input type="text" id="oneliner" name="oneliner" class="form-control" 
+                               placeholder="e.g., Narrator announces blank for permission combo boxes" required aria-required="true" aria-describedby="onelinerInfo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wcag">MAS Failure <span aria-hidden="true" style="color:red;">*</span>
+                            <span class="info-icon" tabindex="0" aria-label="Info" aria-describedby="wcagInfo"><i class="fas fa-info-circle"></i><span class="custom-tooltip" role="tooltip">Select the MAS or WCAG failure that best describes the accessibility issue.</span></span>
+                        </label>
+                        <div id="wcagInfo" class="visually-hidden">Select the MAS or WCAG failure that best describes the accessibility issue.</div>
+                        <select id="wcag" name="wcag" class="form-control" required aria-required="true" aria-describedby="wcagInfo">
+                            <option value="">Select MAS failure</option>
+                            <option value="1.1.1">MAS 1.1.1 - Non-text Content</option>
+                            <option value="1.2.1">MAS 1.2.1 - Audio-only and Video-only (Pre-recorded)</option>
+                            <option value="1.2.2">MAS 1.2.2 - Captions (Pre-recorded)</option>
+                            <option value="1.2.4">MAS 1.2.4 - Captions (Live)</option>
+                            <option value="1.2.5">MAS 1.2.5 - Audio Description (Pre-recorded)</option>
+                            <option value="1.3.1">MAS 1.3.1 - Info and Relationships</option>
+                            <option value="1.3.2">MAS 1.3.2 - Meaningful Sequence</option>
+                            <option value="1.3.3">MAS 1.3.3 - Sensory Characteristics</option>
+                            <option value="1.3.4">MAS 1.3.4 - Orientation</option>
+                            <option value="1.3.5">MAS 1.3.5 - Identify Input Purpose</option>
+                            <option value="1.4.1">MAS 1.4.1 - Use of Color</option>
+                            <option value="1.4.2">MAS 1.4.2 - Audio Controls</option>
+                            <option value="1.4.3">MAS 1.4.3 – Contrast (Minimum)</option>
+                            <option value="1.4.4">MAS 1.4.4 - Resize Text</option>
+                            <option value="1.4.5">MAS 1.4.5 - Images of Text</option>
+                            <option value="1.4.10">MAS 1.4.10 – Reflow</option>
+                            <option value="1.4.11">MAS 1.4.11 - Non-text Contrast</option>
+                            <option value="1.4.12">MAS 1.4.12 - Text Spacing</option>
+                            <option value="1.4.13">MAS 1.4.13 - Content on Hover or Focus</option>
+                            <option value="2.1.1">MAS 2.1.1 - Keyboard</option>
+                            <option value="2.1.2">MAS 2.1.2 - No Keyboard Trap</option>
+                            <option value="2.1.4">MAS 2.1.4 - Character Key Shortcuts</option>
+                            <option value="2.2.1">MAS 2.2.1 - Timing Adjustable</option>
+                            <option value="2.2.2">MAS 2.2.2 - Pause, Stop, Hide</option>
+                            <option value="2.3.1">MAS 2.3.1 - Three Flashes or Below Threshold</option>
+                            <option value="2.4.1">MAS 2.4.1 - By Blocks</option>
+                            <option value="2.4.2">MAS 2.4.2 - Page Titled</option>
+                            <option value="2.4.3">MAS 2.4.3 - Focus Order</option>
+                            <option value="2.4.4">MAS 2.4.4 - Link Purpose (In Context)</option>
+                            <option value="2.4.5">MAS 2.4.5 - Multiple Ways</option>
+                            <option value="2.4.6">MAS 2.4.6 - Headings and Labels</option>
+                            <option value="2.4.7">MAS 2.4.7 - Focus Visible</option>
+                            <option value="2.4.11">MAS 2.4.11 - Focus Not Obscured (Minimum)</option>
+                            <option value="2.5.1">MAS 2.5.1 - Pointer Gestures</option>
+                            <option value="2.5.2">MAS 2.5.2 - Pointer Cancellation</option>
+                            <option value="2.5.3">MAS 2.5.3 - Label in Name</option>
+                            <option value="2.5.4">MAS 2.5.4 - Motion Actuation</option>
+                            <option value="2.5.7">MAS 2.5.7 - Dragging Movements</option>
+                            <option value="2.5.8">MAS 2.5.8 - Target Size (Minimum)</option>
+                            <option value="3.1.1">MAS 3.1.1 - Language of Page</option>
+                            <option value="3.1.2">MAS 3.1.2 - Language of Parts</option>
+                            <option value="3.2.1">MAS 3.2.1 - On Focus</option>
+                            <option value="3.2.2">MAS 3.2.2 - On Input</option>
+                            <option value="3.2.3">MAS 3.2.3 - Consistent Navigation</option>
+                            <option value="3.2.4">MAS 3.2.4 - Consistent Identification</option>
+                            <option value="3.2.6">MAS 3.2.6 - Consistent Help</option>
+                            <option value="3.3.1">MAS 3.3.1 - Error Identification</option>
+                            <option value="3.3.2">MAS 3.3.2 - Labels or Instructions</option>
+                            <option value="3.3.3">MAS 3.3.3 - Error Suggestion</option>
+                            <option value="3.3.4">MAS 3.3.4 - Error Prevention (Legal, Financial, Data)</option>
+                            <option value="3.3.7">MAS 3.3.7 - Redundant Entry</option>
+                            <option value="3.3.8">MAS 3.3.8 - Accessible Authentication (Minimum)</option>
+                            <option value="4.1.2">MAS 4.1.2 - Name, Role, Value</option>
+                            <option value="4.1.3">MAS 4.1.3 - Status Messages</option>
+                            <option value="4.3.1">MAS 4.3.1 - No Disruption of Accessibility Features</option>
+                            <option value="usability">Usability Bug</option>
+                            <option value="functional">Functional Bug</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="url">URL (Optional)
+                            <span class="info-icon" tabindex="0" aria-label="Info" aria-describedby="urlInfo"><i class="fas fa-info-circle"></i><span class="custom-tooltip" role="tooltip">Provide the URL where the issue was found, if applicable.</span></span>
+                        </label>
+                        <div id="urlInfo" class="visually-hidden">Provide the URL where the issue was found, if applicable.</div>
+                        <input type="url" id="url" name="url" class="form-control" 
+                               placeholder="https://example.com/page" aria-describedby="urlInfo">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="environment">Test Environment (Optional)
+                            <span class="info-icon" tabindex="0" aria-label="Info" aria-describedby="envInfo"><i class="fas fa-info-circle"></i><span class="custom-tooltip" role="tooltip">Describe the test environment, e.g., OS, browser, screen reader, etc.</span></span>
+                        </label>
+                        <div id="envInfo" class="visually-hidden">Describe the test environment, e.g., OS, browser, screen reader, etc.</div>
+                        <textarea id="environment" name="environment" class="form-control" rows="3"
+                                  placeholder="OS: Windows 11, Browser: Edge, Screen Reader: Narrator" aria-describedby="envInfo"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn" id="generateBtn" aria-label="Generate Bug Report">
+                        <i class="fas fa-magic" aria-hidden="true"></i> Generate Bug Report
+                    </button>
+                </form>
+
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner" aria-hidden="true"></i>
+                    <p>Generating bug report with AI...</p>
+                </div>
+            </div>
+            <div class="card" id="customFormatCard">
+                <h2><i class="fas fa-file-signature" aria-hidden="true"></i> Custom Bug Report Format
+                    <span class="info-icon" tabindex="0" aria-label="Info" aria-describedby="formatInfo"><i class="fas fa-info-circle"></i><span class="custom-tooltip" role="tooltip">Paste your preferred bug report format/template here. All future bug reports will use this format.</span></span>
+                </h2>
+                <div id="formatInfo" class="visually-hidden">Paste your preferred bug report format/template here. All future bug reports will use this format.</div>
+                <textarea id="customFormat" class="form-control" rows="10" placeholder="Paste your bug report format here..."></textarea>
+                <button class="btn" id="saveFormatBtn" style="margin-top: 12px;" aria-label="Save Custom Format"><i class="fas fa-save" aria-hidden="true"></i> Save Format</button>
+                <div id="formatMsg" style="margin-top: 10px; color: #007a3d; font-weight: 600; min-height: 24px;"></div>
+            </div>
+        </div>
+
+        <div class="result-sections-row" id="resultSectionsRow" style="display: none;">
+            <div class="result-section" id="resultSection">
+                <h2><i class="fas fa-file-alt"></i> Generated Bug Report</h2>
+                <div id="reportContent" class="report-content"></div>
+                <button class="copy-btn" onclick="copyReport()">
+                    <i class="fas fa-copy"></i> Copy Report
+                </button>
+            </div>
+            <div class="result-section" id="suggestionSection">
+                <h2><i class="fas fa-lightbulb"></i> Suggestion for Code Change</h2>
+                <div id="suggestionContent" class="report-content"></div>
+                <button class="copy-btn" onclick="copySuggestion()">
+                    <i class="fas fa-copy"></i> Copy Suggestion
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="accessibility-cards-row">
+        <div class="access-card" tabindex="0">
+            <div class="card-icon"><i class="fas fa-eye"></i></div>
+            <div class="card-title">Perceivable</div>
+            <div class="card-desc">Information and UI components must be presentable to users in ways they can perceive.</div>
+        </div>
+        <div class="access-card" tabindex="0">
+            <div class="card-icon"><i class="fas fa-keyboard"></i></div>
+            <div class="card-title">Operable</div>
+            <div class="card-desc">UI components and navigation must be operable by all users, including keyboard-only users.</div>
+        </div>
+        <div class="access-card" tabindex="0">
+            <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
+            <div class="card-title">Understandable</div>
+            <div class="card-desc">Information and operation of the UI must be understandable to all users.</div>
+        </div>
+        <div class="access-card" tabindex="0">
+            <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="card-title">Robust</div>
+            <div class="card-desc">Content must be robust enough to be interpreted reliably by a wide variety of user agents.</div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-center">
+                <button class="ai-btn gemini-btn" onclick="openInGemini()">
+                    <i class="fas fa-robot"></i> Open in Gemini
+                </button>
+            </div>
+            <div class="footer-left">
+                <p>&copy; 2025 Bug Logging System. Made with ❤️ by <a href="https://www.linkedin.com/in/yash-raj-329ba124b/" target="_blank" class="linkedin-link">Yash Raj</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let currentReport = '';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatus();
+            loadTrainingExamples();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // File upload preview
+            document.getElementById('screenshot').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    document.getElementById('fileLabel').textContent = file.name;
+                }
+            });
+
+            // Bug report form
+            document.getElementById('bugReportForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                generateBugReport();
+            });
+
+            // Training form
+            document.getElementById('trainingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addTrainingExample();
+            });
+        }
+
+        async function loadStatus() {
+            try {
+                const [healthResponse, configResponse] = await Promise.all([
+                    fetch('/api/health'),
+                    fetch('/api/config')
+                ]);
+
+                const health = await healthResponse.json();
+                const config = await configResponse.json();
+
+                document.getElementById('ai-provider').textContent = `AI: ${config.provider.toUpperCase()}`;
+                document.getElementById('training-count').textContent = `Training: ${health.training_examples}`;
+                document.getElementById('server-status').textContent = 'Server: Online';
+            } catch (error) {
+                console.error('Error loading status:', error);
+                document.getElementById('server-status').textContent = 'Server: Offline';
+            }
+        }
+
+        async function loadTrainingExamples() {
+            try {
+                const response = await fetch('/api/training/examples');
+                const data = await response.json();
+                
+                const container = document.getElementById('trainingExamples');
+                container.innerHTML = '';
+
+                if (data.examples.length === 0) {
+                    container.innerHTML = '<p>No training examples found. Add some examples to improve AI accuracy.</p>';
+                    return;
+                }
+
+                data.examples.forEach(example => {
+                    const exampleDiv = document.createElement('div');
+                    exampleDiv.className = 'example-item';
+                    exampleDiv.innerHTML = `
+                        <h4>${example.one_liner}</h4>
+                        <p><strong>WCAG:</strong> ${example.wcag_failure}</p>
+                        <p><strong>Type:</strong> ${example.issue_type}</p>
+                        <button class="copy-btn" onclick="copyTrainingExample('${example.id}')" style="margin-top: 10px;">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    `;
+                    container.appendChild(exampleDiv);
+                });
+            } catch (error) {
+                console.error('Error loading training examples:', error);
+                document.getElementById('trainingExamples').innerHTML = '<p>Error loading training examples.</p>';
+            }
+        }
+
+        async function generateBugReport() {
+            const form = document.getElementById('bugReportForm');
+            const formData = new FormData(form);
+            
+            const loading = document.getElementById('loading');
+            const generateBtn = document.getElementById('generateBtn');
+            const resultSectionsRow = document.getElementById('resultSectionsRow');
+
+            // Show loading
+            loading.style.display = 'block';
+            generateBtn.disabled = true;
+            resultSectionsRow.style.display = 'none';
+
+            try {
+                const customFormat = localStorage.getItem('customBugFormat') || '';
+                formData.append('customFormat', customFormat);
+
+                const response = await fetch('/api/generate-report', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentReport = data.report;
+                    if (typeof data.report === 'object' && data.report !== null) {
+                        document.getElementById('reportContent').innerHTML =
+                          `<b>Gemini (AI):</b><br><pre>${escapeHtml(data.report.gemini)}</pre>`;
+                        document.getElementById('suggestionContent').innerHTML =
+                          `<b>Gemini (AI):</b><br><pre>${escapeHtml(data.report.suggestion)}</pre>`;
+                    } else {
+                        document.getElementById('reportContent').textContent = data.report;
+                        document.getElementById('suggestionContent').textContent = '';
+                    }
+                    document.getElementById('resultSectionsRow').style.display = 'flex';
+                    
+                    // Show success message
+                    showMessage('Bug report and suggestion generated successfully!', 'success');
+                } else {
+                    showMessage(data.error || 'Error generating bug report', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Network error. Please try again.', 'error');
+            } finally {
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        }
+
+        async function addTrainingExample() {
+            const form = document.getElementById('trainingForm');
+            const formData = new FormData(form);
+            
+            const data = {
+                one_liner: formData.get('one_liner'),
+                wcag_failure: formData.get('wcag_failure'),
+                full_report: formData.get('full_report')
+            };
+
+            try {
+                const response = await fetch('/api/training/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showMessage('Training example added successfully!', 'success');
+                    form.reset();
+                    loadTrainingExamples();
+                    loadStatus();
+                } else {
+                    showMessage(result.error || 'Error adding training example', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Network error. Please try again.', 'error');
+            }
+        }
+
+        function copyReport() {
+            let text = '';
+            if (typeof currentReport === 'object' && currentReport !== null) {
+                text = `Gemini (AI):\n${currentReport.gemini}`;
+            } else {
+                text = currentReport;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('Report copied to clipboard!', 'success');
+            }).catch(() => {
+                showMessage('Failed to copy report', 'error');
+            });
+        }
+
+        function copyTrainingExample(id) {
+            // This would need to be implemented with the actual training example data
+            showMessage('Training example copied!', 'success');
+        }
+
+        function copySuggestion() {
+            let text = '';
+            if (typeof currentReport === 'object' && currentReport !== null) {
+                text = `Gemini (AI):\n${currentReport.suggestion}`;
+            } else {
+                text = '';
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('Suggestion copied to clipboard!', 'success');
+            }).catch(() => {
+                showMessage('Failed to copy suggestion', 'error');
+            });
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            
+            document.querySelector('.container').insertBefore(messageDiv, document.querySelector('.main-content'));
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Helper to escape HTML for safe rendering
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>'"]/g, function (c) {
+                return ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                })[c];
+            });
+        }
+
+        function openInGemini() {
+            const oneliner = document.getElementById('oneliner').value;
+            const wcag = document.getElementById('wcag').value;
+            const url = document.getElementById('url').value;
+            const environment = document.getElementById('environment').value;
+            
+            if (!oneliner || !wcag) {
+                showMessage('Please fill in the required fields first', 'error');
+                return;
+            }
+
+            const prompt = `Generate a detailed accessibility bug report for the following issue:
+
+Issue Description: ${oneliner}
+MAS/WCAG Failure: ${wcag}
+URL: ${url || 'Not provided'}
+Test Environment: ${environment || 'Not provided'}
+
+Please provide a comprehensive bug report including:
+1. Summary
+2. Steps to Reproduce
+3. Expected Behavior
+4. Actual Behavior
+5. Impact on Accessibility
+6. Suggested Fix
+7. Priority Level
+8. Additional Notes
+
+Format the report professionally for bug tracking systems.`;
+
+            const geminiUrl = `https://gemini.google.com/app?prompt=${encodeURIComponent(prompt)}`;
+            window.open(geminiUrl, '_blank');
+        }
+
+        // Accessible tooltip logic for info icons
+        (function() {
+            const infoIcons = document.querySelectorAll('.info-icon');
+            infoIcons.forEach(icon => {
+                const tooltip = icon.querySelector('.custom-tooltip');
+                // Show on focus/hover
+                icon.addEventListener('focus', () => icon.classList.add('show-tooltip'));
+                icon.addEventListener('mouseenter', () => icon.classList.add('show-tooltip'));
+                // Hide on blur/leave
+                icon.addEventListener('blur', () => icon.classList.remove('show-tooltip'));
+                icon.addEventListener('mouseleave', () => icon.classList.remove('show-tooltip'));
+                // Hide on Escape
+                icon.addEventListener('keydown', e => {
+                    if (e.key === 'Escape') {
+                        icon.classList.remove('show-tooltip');
+                        icon.blur();
+                    }
+                });
+            });
+        })();
+
+        // Custom Bug Report Format logic
+        (function() {
+            const formatTextarea = document.getElementById('customFormat');
+            const saveBtn = document.getElementById('saveFormatBtn');
+            const msg = document.getElementById('formatMsg');
+            // Load from localStorage
+            const savedFormat = localStorage.getItem('customBugFormat');
+            if (savedFormat) {
+                formatTextarea.value = savedFormat;
+                msg.textContent = 'Custom format loaded and in use.';
+            }
+            saveBtn.addEventListener('click', function() {
+                const val = formatTextarea.value.trim();
+                if (val) {
+                    localStorage.setItem('customBugFormat', val);
+                    msg.textContent = 'Custom format saved and will be used for all future bug reports.';
+                } else {
+                    localStorage.removeItem('customBugFormat');
+                    msg.textContent = 'Custom format cleared. Default format will be used.';
+                }
+            });
+        })();
+    </script>
+</body>
+</html> 
